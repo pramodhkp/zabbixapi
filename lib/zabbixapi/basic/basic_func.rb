@@ -1,3 +1,9 @@
+class Hash
+  def <=> (other_hash)
+    self.keys.collect!{|key| key.to_s} <=> other_hash.keys.collect!{|key| key.to_s}
+  end
+end
+
 class ZabbixApi
   class Basic
 
@@ -6,8 +12,8 @@ class ZabbixApi
     end
 
     def hash_equals?(a, b)
-      a_new = normalize_hash(a)
-      b_new = normalize_hash(b)
+      a_new = normalize_obj(a)
+      b_new = normalize_obj(b)
       hash1 = a_new.merge(b_new)
       hash2 = b_new.merge(a_new)
       hash1 == hash2
@@ -19,17 +25,22 @@ class ZabbixApi
       obj
     end
 
-    def normalize_hash(hash)
-      result = hash.dup
-      result.delete(:hostid) #TODO remove to logig. TemplateID and HostID has different id 
-      result.each do |key, value|
-        case value
-          when Array
-            result.delete(key)
-          else
-            result[key] = value.to_s
-        end
+    def normalize_obj(obj)
+      result = nil
+      # obj.delete(:hostid) if obj.is_a? Hash #TODO remove to logig. TemplateID and HostID has different id
+      case obj
+        when Hash
+          result = obj.dup
+          result.each do |key,value|
+            result[key] = normalize_obj(value)
+          end
+        when Array
+          result = obj.dup
+          result.collect! {|item| normalize_obj(item)}
+        else
+          result = obj.to_s
       end
+      result.sort! if result.respond_to?(:sort!)
       result
     end
 
