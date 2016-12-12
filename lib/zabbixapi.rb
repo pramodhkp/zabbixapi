@@ -20,6 +20,7 @@ require "zabbixapi/classes/screens"
 require "zabbixapi/classes/server"
 require "zabbixapi/classes/templates"
 require "zabbixapi/classes/triggers"
+require "zabbixapi/classes/events"
 require "zabbixapi/classes/unusable"
 require "zabbixapi/classes/usergroups"
 require "zabbixapi/classes/usermacros"
@@ -85,6 +86,10 @@ class ZabbixApi
 
   def triggers
     @triggers ||= Triggers.new(@client)
+  end
+
+  def events
+    @events ||= Events.new(@client)
   end
 
   def graphs
